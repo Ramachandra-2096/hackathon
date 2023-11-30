@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import LoginForm, SignUpForm
 from django.contrib.auth.views import LoginView
 
-class CustomLoginView(LoginView):
+class CustomLoginView(LoginView): ##RUNNING
     def get(self, request, *args, **kwargs):
         redirect_url = '/custom_login'
         return redirect(redirect_url)
@@ -13,8 +13,10 @@ class CustomLoginView(LoginView):
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
 
+def land(request):
+    return render(request,"land.html")
 
-def custom_login(request):
+def custom_login(request):  ##RUNNING
     login_form = LoginForm()
     signup_form = SignUpForm()
     if request.method == 'POST':
@@ -27,7 +29,7 @@ def custom_login(request):
                 if user is not None:
                     auth_login(request, user)
                     messages.add_message(request, messages.SUCCESS, 'Login successful!')
-                    return redirect('home', permanent=True)  # 'permanent=True' will cause a 301 redirect  
+                    return redirect('home', permanent=True) 
                 else:
                     messages.error(request, 'Invalid username or password')
             else:
@@ -40,9 +42,109 @@ def custom_login(request):
                 user.save()
                 auth_login(request, user)
                 messages.success(request, 'Signup successful!')
-                return redirect('home')
+                return redirect('user_profile')
             else:
                 messages.error(request, 'Signup form is not valid')
                 print(form.errors)
 
     return render(request, 'login.html', {'login_form': login_form, 'signup_form': signup_form})
+
+from django.shortcuts import render, redirect
+from django.views import View
+from .models import ChatMessage, Company
+import uuid
+
+def generate_unique_code():  ##RUNNING
+    unique_code = str(uuid.uuid4())
+    return unique_code
+
+class CompanySignupView(View):  ##RUNNING
+    template_name = 'company_Register.html'
+    def get(self, request):
+        return render(request, self.template_name)
+
+    def post(self, request):
+        company_name = request.POST.get('companyName')
+        gst_code = request.POST.get('code')
+        date_of_creation = request.POST.get('dateOfCreation')
+        if Company.objects.filter(company_name=company_name, gstin=gst_code).exists():
+            return render(request, self.template_name, {'error_message': 'Duplicate combination of company name and GST code'})
+        code =generate_unique_code()
+        company = Company.objects.create(
+            company_name=company_name,
+            gstin=gst_code,
+            created_date=date_of_creation,
+            company_code=code
+        )
+        return render(request,'company_Register.html',{'code':code}) 
+    
+@login_required
+def home(request):   ##RUNNING
+    user=request.user
+    user_profile = UserProfile.objects.get(user=user)
+    profile_image_url = user_profile.profile_image.url
+    return render(request,'home.html',{'user':user,'profile':profile_image_url})
+
+@login_required
+def meet(request):   ##RUNNING
+    user =request.user
+    return render(request,'WEB_UIKITS.html',{'username':user.first_name})
+
+@login_required
+def Custom_logout(request): ##RUNNING
+    logout(request)
+    return redirect('custom_login')
+
+from django.http import JsonResponse
+
+@login_required
+def chat_view(request):
+    if request.method == 'POST':
+        message_content = request.POST.get('message')
+        if message_content:
+            ChatMessage.objects.create(user=request.user, content=message_content)
+            return JsonResponse({'status': 'success'})
+    user =request.user
+    company = user.company
+    messages = ChatMessage.objects.filter(company=company)
+    return render(request, 'chat.html', {'messages': messages})
+
+# views.py
+from django.http import JsonResponse
+
+@login_required
+def get_messages(request):
+    messages = ChatMessage.objects.all()
+    messages_data = [{'user': message.user.username, 'content': message.content} for message in messages]
+    return JsonResponse({'messages': messages_data})
+
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .forms import UserProfileForm
+from .models import UserProfile, Company
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import UserProfile
+from .forms import UserProfileForm
+
+@login_required
+def user_profile(request):  ##RUNNING
+    user = request.user
+    if UserProfile.objects.filter(user=user).exists():
+        return redirect('home')
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, request.FILES)
+        if form.is_valid():
+            user_profile_data = form.cleaned_data
+            company = get_object_or_404(Company, company_code=user_profile_data['company_code'])
+            profile, created = UserProfile.objects.get_or_create(user=user, defaults={'company': company})
+            profile.birth_date = user_profile_data['birth_date']
+            profile.profile_image = user_profile_data['profile_image']
+            profile.interests.set(user_profile_data['interests'])
+            profile.save()
+
+            return redirect('home')
+    else:
+        form = UserProfileForm()
+    return render(request, 'servay.html', {'form': form})

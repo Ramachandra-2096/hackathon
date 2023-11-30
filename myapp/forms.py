@@ -12,3 +12,16 @@ class SignUpForm(UserCreationForm):
 class LoginForm(forms.Form):
     username = forms.CharField()
     password = forms.CharField(widget=forms.PasswordInput)
+    
+from django import forms
+from .models import Interest, UserProfile
+
+class UserProfileForm(forms.ModelForm):
+    birth_date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
+    interests = forms.ModelMultipleChoiceField(queryset=Interest.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
+    profile_image = forms.ImageField(required=False)
+    company_code = forms.CharField(max_length=255)
+
+    class Meta:
+        model = UserProfile
+        fields = ['birth_date', 'interests', 'profile_image', 'company_code']
