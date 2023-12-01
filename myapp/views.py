@@ -118,8 +118,10 @@ def chat_view(request):
 
 @login_required
 def get_messages(request):
-    messages = ChatMessage.objects.all()
-    messages_data = [{'user': message.user.first_name, 'content': message.content, 'is_mine': message.user == request.user} for message in messages]
+    user = request.user
+    profile = UserProfile.objects.get(user=user)
+    messages = ChatMessage.objects.filter(company=profile.company)
+    messages_data = [{'user': message.user.first_name, 'content': message.content,'timestamp': message.timestamp, 'is_mine': message.user == request.user} for message in messages]
     return JsonResponse({'messages': messages_data})
 
 

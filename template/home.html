@@ -52,8 +52,58 @@
         <a href="#" class="block text-white mt-2">Connect with People</a>
     </div>
     <div class="container mx-auto py-8">
+        <div class="bg-blue-500 text-white py-16">
+            <div class="container mx-auto text-center">
+                <h1 class="text-4xl font-bold mb-4">Company Dashboard</h1>
+                <!-- Chart: Completed Projects vs Time -->
+                <canvas id="completedProjectsChart" class="mb-8"></canvas>
+                <!-- Action buttons -->
+                <div class="flex justify-center">
+                    <a href="/create-project" class="bg-green-500 text-white px-6 py-3 rounded mr-4">Create a Project</a>
+                    <a href="/to-do-list" class="bg-indigo-500 text-white px-6 py-3 rounded">To-Do List</a>
+                </div>
+            </div>
+        </div>
+    
+        <script>
+            // Chart configuration
+            const completedProjectsData = JSON.parse('{{ completed_projects_data|safe }}');
+            const completedProjectsConfig = {
+                type: 'line',
+                data: {
+                    labels: completedProjectsData.labels,
+                    datasets: [{
+                        label: 'Company Projects',
+                        data: completedProjectsData.company_projects,
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1,
+                    }, {
+                        label: 'User Projects',
+                        data: completedProjectsData.user_projects,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                    }],
+                },
+                options: {
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                        },
+                        y: {
+                            min: 0,
+                        },
+                    },
+                },
+            };
+    
+            // Create Completed Projects vs Time chart
+            const completedProjectsChart = new Chart(document.getElementById('completedProjectsChart'), completedProjectsConfig);
+        </script>
     </div>
-    <!-- Footer -->
+    <
     <footer class="bg-gray-800 text-white text-center py-4">
         <p>&copy; 2023 GitHub. All rights reserved.</p>
     </footer>
