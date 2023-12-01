@@ -30,6 +30,7 @@ from django import forms
 from .models import Project
 
 class ProjectUploadForm(forms.ModelForm):
+    project_name = forms.CharField(max_length=300 )
     class Meta:
         model = Project
         fields = ['project_file','project_name']

@@ -75,7 +75,7 @@
             {% csrf_token %}
             <div class="mb-4">
                 <label for="projectName" class="text-gray-600 text-sm block">Project Name</label>
-               <p class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">{{form.project_name}}</p> 
+               {{form.project_name}} 
             </div>
             <div class="mb-4 file-input-container">
                 <label for="file" class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></label>
@@ -86,7 +86,6 @@
         </form>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
         // Set up Three.js scene
