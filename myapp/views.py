@@ -97,26 +97,31 @@ def Custom_logout(request): ##RUNNING
 
 from django.http import JsonResponse
 
+# views.py
+from django.http import JsonResponse
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from .models import ChatMessage
+
 @login_required
 def chat_view(request):
     if request.method == 'POST':
-        message_content = request.POST.get('message')
+        user = request.user
+        profile = UserProfile.objects.get(user=user)
+        message_content = request.POST.get('message_input')
         if message_content:
-            ChatMessage.objects.create(user=request.user, content=message_content)
+            ChatMessage.objects.create(user=request.user,company=profile.company, content=message_content)
             return JsonResponse({'status': 'success'})
-    user =request.user
-    company = user.company
-    messages = ChatMessage.objects.filter(company=company)
-    return render(request, 'chat.html', {'messages': messages})
-
-# views.py
-from django.http import JsonResponse
+    profile = UserProfile.objects.get(user=request.user)
+    messages = ChatMessage.objects.filter(company=profile.company)
+    return render(request, 'chat.html', {'messages': messages,'c':profile.company})
 
 @login_required
 def get_messages(request):
     messages = ChatMessage.objects.all()
-    messages_data = [{'user': message.user.username, 'content': message.content} for message in messages]
+    messages_data = [{'user': message.user.first_name, 'content': message.content, 'is_mine': message.user == request.user} for message in messages]
     return JsonResponse({'messages': messages_data})
+
 
 
 from django.shortcuts import render, redirect
