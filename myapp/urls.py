@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import custom_login
 from django.contrib import admin
-from .views import custom_login,home,Custom_logout,meet,chat_view,get_messages,user_profile,CompanySignupView,land,index,create,update,delete
+from .views import custom_login,home,Custom_logout,meet,chat_view,get_messages,user_profile,CompanySignupView,land,index,create,update,delete,DummyDataView,UserListView, FollowToggleView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', land),
@@ -15,7 +15,10 @@ urlpatterns = [
     path('logout/', Custom_logout, name='logout'),
     path('get_messages/', get_messages, name='get_messages'),
     path('todo', index, name='index'),
+    path('dummy-data/', DummyDataView.as_view(), name='dummy_data'),
     path('create/', create, name='create'),
     path('update/<int:pk>/',update, name='update'),
     path('delete/<int:pk>/',delete, name='delete'),
+    path('users/', UserListView.as_view(), name='user_list'),
+    path('follow_toggle/', FollowToggleView.as_view(), name='follow_toggle'),
 ]

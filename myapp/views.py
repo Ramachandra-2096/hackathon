@@ -16,6 +16,17 @@ class CustomLoginView(LoginView): ##RUNNING
 def land(request):
     return render(request,"land.html")
 
+from django.views import View
+class DummyDataView(View):
+    def get(self, request, *args, **kwargs):
+        completed_projects_data = {
+            'labels': ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+            'company_projects': [10, 20, 15, 25, 30],
+            'user_projects': [5, 15, 10, 20, 25],
+        }
+
+        return JsonResponse(completed_projects_data)
+    
 def custom_login(request):  ##RUNNING
     login_form = LoginForm()
     signup_form = SignUpForm()
@@ -28,7 +39,6 @@ def custom_login(request):  ##RUNNING
                 user = authenticate(request, username=email, password=password)
                 if user is not None:
                     auth_login(request, user)
-                    messages.add_message(request, messages.SUCCESS, 'Login successful!')
                     return redirect('home', permanent=True) 
                 else:
                     messages.error(request, 'Invalid username or password')
@@ -41,7 +51,6 @@ def custom_login(request):  ##RUNNING
                 user = form.save(commit=False)
                 user.save()
                 auth_login(request, user)
-                messages.success(request, 'Signup successful!')
                 return redirect('user_profile')
             else:
                 messages.error(request, 'Signup form is not valid')
@@ -95,9 +104,7 @@ def Custom_logout(request): ##RUNNING
     logout(request)
     return redirect('custom_login')
 
-from django.http import JsonResponse
 
-# views.py
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
@@ -186,3 +193,47 @@ def delete(request, pk):
         task = Task.objects.get(user=request.user,pk=pk)
         task.delete()
         return JsonResponse({'status': 'ok'})
+
+
+from django.shortcuts import render
+from django.views import View
+from django.contrib.auth.models import User
+from django.http import JsonResponse
+from .models import Connection
+from django.utils.decorators import method_decorator
+
+@method_decorator(login_required, name='dispatch')
+class UserListView(View):
+    def get(self, request, *args, **kwargs):
+        users = User.objects.exclude(id=request.user.id)
+        connections = Connection.objects.filter(from_user=request.user)
+        profile_image_urls = []
+
+        for user in users:
+            try:
+                user_profile = UserProfile.objects.get(user=user)
+                profile_image_urls.append({'user': user, 'image_url': user_profile.profile_image.url})
+            except UserProfile.DoesNotExist:
+                profile_image_urls.append({'user': user, 'image_url': ''})
+
+        context = {
+            'users': users,
+            'connections': connections,
+            'profile_image_urls': profile_image_urls,
+        }
+
+        return render(request, 'user_list.html', context)
+    
+    
+class FollowToggleView(View):
+    def post(self, request, *args, **kwargs):
+        user_id = request.POST.get('user_id')
+        user_to_follow = User.objects.get(id=user_id)
+        connection_exists = Connection.objects.filter(from_user=request.user, to_user=user_to_follow).exists()
+        if connection_exists:
+            Connection.objects.filter(from_user=request.user, to_user=user_to_follow).delete()
+            status = 'unfollowed'
+        else:
+            Connection.objects.create(from_user=request.user, to_user=user_to_follow)
+            status = 'followed'
+        return JsonResponse({'status': status})
