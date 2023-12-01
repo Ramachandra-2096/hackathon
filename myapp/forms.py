@@ -25,4 +25,12 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ['birth_date', 'interests', 'profile_image', 'company_code']
-        
+
+from django import forms
+from .models import Project
+
+class ProjectUploadForm(forms.ModelForm):
+    class Meta:
+        model = Project
+        fields = ['project_file','project_name']
+  

@@ -41,7 +41,7 @@
             </a>
             <div class="ml-4 hidden lg:flex">
                 <a href="{% url 'chat' %}" class="ml-4">Chat</a>
-                <a href="#" class="ml-4">Resource Share</a>
+                <a href="{% url 'file_list' %}" class="ml-4">Resource Share</a>
                 <a href="{% url 'meet' %}" class="ml-4">Meet</a>
                 <a href="{% url 'user_list' %}" class="ml-4">Connect with People</a>
             </div>
@@ -51,9 +51,9 @@
     <!-- Mobile Navigation Menu (hidden by default) -->
     <div class="lg:hidden bg-gray-900 text-white p-4">
         <a href="{% url 'chat' %}" class="block text-white">Chat</a>
-        <a href="#" class="block text-white mt-2">Resource Share</a>
+        <a href="{% url 'file_list' %}" class="block text-white mt-2">Resource Share</a>
         <a href="{% url 'meet' %}" class="block text-white mt-2">Meet</a>
-        <a href="#" class="block text-white mt-2">Connect with People</a>
+        <a href="{% url 'user_list' %}"class="block text-white mt-2">Connect with People</a>
     </div>
    
     <div class="bg-white text-gray py-16">
@@ -62,7 +62,7 @@
             <!-- Use a flex container for better alignment -->
             <div class="flex flex-col items-center justify-center md:flex-row md:justify-between">
                 <!-- Action buttons with a shadow effect -->
-                <a href="/create-project" class="bg-green-500 text-white px-8 py-4 rounded shadow-md mb-4 md:mb-0 md:mr-4 hover:bg-green-600 transition">Create a Project</a>
+                <a href="{% url 'upload_project' %}" class="bg-green-500 text-white px-8 py-4 rounded shadow-md mb-4 md:mb-0 md:mr-4 hover:bg-green-600 transition">Create a Project</a>
                 <a href="{% url 'index' %}" class="bg-indigo-500 text-white px-8 py-4 rounded shadow-md hover:bg-indigo-600 transition">To-Do List</a>
             </div>
             <!-- Chart: Completed Projects vs Time -->

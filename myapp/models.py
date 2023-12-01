@@ -63,3 +63,10 @@ class Task(models.Model):
     completed = models.BooleanField(default=False)
     def __str__(self):
         return self.title
+
+from django.db import models
+
+class Project(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    project_file = models.FileField(upload_to='uploads/')
+    project_name = models.CharField(max_length=252)

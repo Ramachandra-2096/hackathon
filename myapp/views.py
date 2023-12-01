@@ -60,7 +60,7 @@ def custom_login(request):  ##RUNNING
 
 from django.shortcuts import render, redirect
 from django.views import View
-from .models import ChatMessage, Company
+from .models import ChatMessage, Company, Project
 import uuid
 
 def generate_unique_code():  ##RUNNING
@@ -238,3 +238,32 @@ class FollowToggleView(View):
             status = 'followed'
         return JsonResponse({'status': status})
 
+from django.shortcuts import render, redirect
+from .forms import ProjectUploadForm
+@login_required
+def upload_project(request):
+    if request.method == 'POST':
+        form = ProjectUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            project = form.save(commit=False)
+            project.user=request.user
+            project.save()
+            return redirect('home')
+    else:
+        form = ProjectUploadForm()
+
+    return render(request, 'upload.html', {'form': form})
+
+# myapp/views.py
+from django.shortcuts import render
+from django.http import HttpResponse
+
+def file_list(request):
+    files = Project.objects.all()
+    return render(request, 'file_list.html', {'files': files})
+
+def download_file(request, file_id):
+    file = Project.objects.get(id=file_id)
+    response = HttpResponse(file.project_file, content_type='application/force-download')
+    response['Content-Disposition'] = f'attachment; filename={file.project_file}'
+    return response

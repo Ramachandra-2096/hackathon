@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import custom_login
 from django.contrib import admin
-from .views import custom_login,home,Custom_logout,meet,chat_view,get_messages,user_profile,CompanySignupView,land,index,create,update,delete,DummyDataView,UserListView, FollowToggleView
+from .views import custom_login,home,Custom_logout,meet,chat_view,get_messages,user_profile,CompanySignupView,land,index,create,update,delete,DummyDataView,UserListView, FollowToggleView,file_list, download_file,upload_project
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', land),
@@ -21,4 +21,7 @@ urlpatterns = [
     path('delete/<int:pk>/',delete, name='delete'),
     path('users/', UserListView.as_view(), name='user_list'),
     path('follow_toggle/', FollowToggleView.as_view(), name='follow_toggle'),
+    path('upload/', upload_project, name='upload_project'),
+    path('files/', file_list, name='file_list'),
+    path('files/<int:file_id>/download/', download_file, name='download_file'),
 ]
