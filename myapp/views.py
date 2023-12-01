@@ -237,3 +237,4 @@ class FollowToggleView(View):
             Connection.objects.create(from_user=request.user, to_user=user_to_follow)
             status = 'followed'
         return JsonResponse({'status': status})
+
